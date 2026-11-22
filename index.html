@@ -7,75 +7,85 @@
 <title>Drum Lab</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
 <style>
-/* Layout: editor di kiri (jenis drum, gelombang, slider), library di kanan; satu kolom di layar sempit. */
+/* Layout: panel instrumen abu-abu. Editor di kiri, library di kanan; satu kolom di layar sempit. Aksen tunggal oranye. */
 :root {
-  --bg: #eceff3; --panel: #ffffff; --panel2: #f4f6f9; --fg: #131820; --muted: #566274;
-  --line: #d3d9e2; --acc-s: 72%; --acc-l: 46%; --danger: #b3261e; --on-acc: #ffffff;
+  --bg: #d6d6d2; --panel: #e6e6e2; --panel2: #cbcbc6; --fg: #121212; --muted: #67675f;
+  --line: #adada7; --key-shadow: #a2a29c; --acc: #ff5a1f; --acc-soft: rgba(255, 90, 31, 0.16);
+  --on-acc: #121212; --danger: #b3261e; --lcd: #1b1c1a; --scope-line: #3b3d39; --lcd-fg: #ff6a2b;
   --f-head: "Space Grotesk", system-ui, sans-serif;
   --f-body: "Inter", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, monospace;
-  --h: 255;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1217; --panel: #161b22; --panel2: #1d232c; --fg: #e8ecf2; --muted: #95a1b3;
-    --line: #2a323d; --acc-l: 66%; --danger: #ff8a80; --on-acc: #0e1217; color-scheme: dark;
+    --bg: #141413; --panel: #1f1f1d; --panel2: #2a2a27; --fg: #efeee8; --muted: #9b9a92;
+    --line: #3a3a36; --key-shadow: #0a0a09; --acc: #ff6a2b; --acc-soft: rgba(255, 106, 43, 0.2);
+    --danger: #ff8a80; --lcd: #0c0d0b; --scope-line: #2c2e2a; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1217; --panel: #161b22; --panel2: #1d232c; --fg: #e8ecf2; --muted: #95a1b3;
-  --line: #2a323d; --acc-l: 66%; --danger: #ff8a80; --on-acc: #0e1217; color-scheme: dark;
+  --bg: #141413; --panel: #1f1f1d; --panel2: #2a2a27; --fg: #efeee8; --muted: #9b9a92;
+  --line: #3a3a36; --key-shadow: #0a0a09; --acc: #ff6a2b; --acc-soft: rgba(255, 106, 43, 0.2);
+  --danger: #ff8a80; --lcd: #0c0d0b; --scope-line: #2c2e2a; color-scheme: dark;
 }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.5;
   padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-#app, .lib-group { --acc: hsl(var(--h) var(--acc-s) var(--acc-l)); --acc-soft: hsl(var(--h) 70% 50% / 0.14); }
-#app[data-type="kick"] { --h: 255; } #app[data-type="snare"] { --h: 175; } #app[data-type="hat"] { --h: 38; }
-#app[data-type="clap"] { --h: 322; } #app[data-type="tom"] { --h: 135; }
 .wrap { max-width: 1080px; margin: 0 auto; }
-h1 { font-family: var(--f-head); font-size: 28px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; }
-h2 { font-family: var(--f-head); font-size: 16px; margin: 0; letter-spacing: 0.01em; }
+h1 { font-family: var(--f-head); font-weight: 700; font-size: 30px; line-height: 1; margin: 0 0 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+h1::after { content: ""; display: inline-block; width: 12px; height: 12px; background: var(--acc); margin-left: 10px; border-radius: 50%; }
+h2 { font: 500 12px var(--f-mono); margin: 0; letter-spacing: 0.12em; text-transform: uppercase; }
+h2::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--acc); margin-right: 8px; }
 .sub { margin: 0 0 22px; color: var(--muted); max-width: 60ch; }
-.grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-.stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-.tab { font: 600 13px var(--f-body); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
-.tab[aria-selected="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc); }
-.scope { position: relative; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+button, .tab { font: 500 12px var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--fg); padding: 9px 12px;
+  box-shadow: 0 3px 0 var(--key-shadow); transition: transform .05s, box-shadow .05s; }
+button:hover, .tab:hover { border-color: var(--fg); }
+button:active, .tab:active { transform: translateY(3px); box-shadow: 0 0 0 var(--key-shadow); }
+button:focus-visible, input:focus-visible, .tab:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.tab[aria-selected="true"], button.primary, .switch button[aria-pressed="true"] { background: var(--acc); border-color: var(--fg); color: var(--on-acc); }
+.tab.grp { font-size: 11px; padding: 6px 12px; background: transparent; box-shadow: none; border-color: transparent; color: var(--muted); border-radius: 0; }
+.tab.grp:active { transform: none; }
+.tab.grp[aria-pressed="true"] { color: var(--fg); border-bottom: 2px solid var(--acc); }
+.groups { gap: 2px; margin-bottom: -6px; }
+.scope { position: relative; background: var(--lcd); border: 2px solid var(--fg); border-radius: 8px; overflow: hidden; }
 canvas#wave { display: block; width: 100%; height: 160px; }
-.play { position: absolute; right: 10px; bottom: 10px; }
-button { font: 600 13px var(--f-body); cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); padding: 8px 12px; }
-button:hover { border-color: var(--acc); }
-button:focus-visible, input:focus-visible, .tab:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-button.primary { background: var(--acc); border-color: var(--acc); color: var(--on-acc); }
+.play { position: absolute; right: 10px; bottom: 12px; }
 button.danger { color: var(--danger); }
 .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.knob { display: grid; grid-template-columns: 96px minmax(0, 1fr) 34px 32px; gap: 10px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); }
+.audition { display: grid; grid-template-columns: auto minmax(0, 1fr) 30px auto; gap: 10px; align-items: center; }
+.audition label, .knob label { font: 500 12px var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+#hum[aria-pressed="true"], .lock[aria-pressed="true"] { background: var(--acc-soft); border-color: var(--acc); color: var(--fg); }
+.knob { display: grid; grid-template-columns: 104px minmax(0, 1fr) 34px 34px; gap: 10px; align-items: center; padding: 7px 0; border-top: 1px dashed var(--line); }
 .knob:first-child { border-top: 0; }
-.knob label { font-weight: 500; }
-.val { font: 500 12px var(--f-mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
-.lock { padding: 5px; width: 30px; height: 30px; display: grid; place-items: center; color: var(--muted); }
-.lock[aria-pressed="true"] { background: var(--acc-soft); color: var(--acc); border-color: var(--acc); }
-input[type=range] { width: 100%; accent-color: var(--acc); height: 24px; margin: 0; }
-input[type=text] { font: 500 14px var(--f-body); background: var(--panel2); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.val { font: 500 12px var(--f-mono); color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; }
+.lock { padding: 0; width: 32px; height: 30px; display: grid; place-items: center; color: var(--muted); box-shadow: 0 2px 0 var(--key-shadow); }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; background: var(--fg); border-radius: 0; }
+input[type=range]::-moz-range-track { height: 4px; background: var(--fg); border-radius: 0; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 22px; margin-top: -9px; background: var(--acc); border: 2px solid var(--fg); border-radius: 3px; }
+input[type=range]::-moz-range-thumb { width: 10px; height: 18px; background: var(--acc); border: 2px solid var(--fg); border-radius: 3px; }
+input[type=text] { font: 500 13px var(--f-mono); background: var(--panel2); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; min-width: 0; }
 .name { flex: 1 1 160px; }
-.switch { display: inline-flex; gap: 0; }
-.switch button { border-radius: 0; padding: 6px 12px; }
-.switch button:first-child { border-radius: 8px 0 0 8px; } .switch button:last-child { border-radius: 0 8px 8px 0; margin-left: -1px; }
-.switch button[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc); }
+.switch { display: inline-flex; }
+.switch button { border-radius: 0; margin-left: -1px; } .switch button:first-child { border-radius: 6px 0 0 6px; margin-left: 0; } .switch button:last-child { border-radius: 0 6px 6px 0; }
 .hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
-.head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.lib-group { margin-top: 14px; } .lib-group h3 { font: 600 11px var(--f-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
-.item { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 5px 0; }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.lib-group { margin-top: 14px; } .lib-group h3 { font: 500 11px var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.item { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 5px 0; }
 .item input { width: 100%; padding: 6px 8px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--acc); justify-self: center; }
-.item .acts { display: flex; gap: 4px; } .item .acts button { padding: 5px 8px; font-size: 12px; }
-.empty { color: var(--muted); font-size: 13px; padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: 8px; }
-#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100vw - 32px); z-index: 20; }
+.dot { width: 8px; height: 8px; background: var(--acc); justify-self: center; }
+.item .acts { display: flex; gap: 6px; } .item .acts button { padding: 5px 8px; font-size: 11px; box-shadow: 0 2px 0 var(--key-shadow); }
+.empty { color: var(--muted); font-size: 13px; padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: 6px; }
+#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--lcd); color: var(--lcd-fg); font: 500 12px var(--f-mono); letter-spacing: 0.04em; border: 2px solid var(--fg); padding: 9px 14px; border-radius: 6px; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100vw - 32px); z-index: 20; }
 #toast.on { opacity: 1; }
-@media (max-width: 480px) { .knob { grid-template-columns: 78px minmax(0, 1fr) 30px 30px; gap: 6px; } }
-@media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+@media (max-width: 480px) { .knob { grid-template-columns: 84px minmax(0, 1fr) 30px 32px; gap: 6px; } }
+@media (prefers-reduced-motion: reduce) { #toast, button, .tab { transition: none; } }
 </style>
 </head>
 <body>
@@ -84,9 +94,13 @@ input[type=text] { font: 500 14px var(--f-body); background: var(--panel2); colo
   <p class="sub">Buat suara drum dari sintesis. Simpan ke library, lalu ekspor sebagai WAV, JSON, atau kode JavaScript untuk dipakai di drum machine Anda.</p>
   <div class="grid">
     <main class="stack">
-      <div class="tabs" id="tabs" role="tablist" aria-label="Jenis drum"></div>
+      <div class="tabs groups" id="groups" aria-label="Kelompok suara"></div>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Jenis suara"></div>
       <div class="scope"><canvas id="wave" aria-label="Bentuk gelombang suara"></canvas>
         <button class="play primary" id="play">Mainkan</button></div>
+      <div class="row audition"><label for="vel">Velocity</label><input type="range" id="vel" min="10" max="100" value="100"><span class="val" id="velv">100</span>
+        <button type="button" id="hum" aria-pressed="false">Humanize</button></div>
+      <p class="hint" style="margin:-8px 0 0">Velocity dan humanize hanya untuk mencoba suara. Keduanya dipakai lewat kode JS saat suara dimainkan di aplikasi lain.</p>
       <section class="card">
         <div class="head"><h2 id="typeTitle">Kick</h2><span class="hint" style="margin:0">Gembok mengunci slider saat Acak atau Mutasi</span></div>
         <div id="knobs"></div>
@@ -123,7 +137,13 @@ input[type=text] { font: 500 14px var(--f-body); background: var(--panel2); colo
 /* ---------- Mesin suara ----------
    Semua nilai p bernilai 0..1. Fungsi ini berdiri sendiri: dipakai untuk
    pemutaran, render WAV, dan disalin apa adanya ke kode ekspor. */
-function drumVoice(ctx, dest, type, p, t) {
+function drumVoice(ctx, dest, type, p, t, vel, hum) {
+  if (hum) {
+    var q = {};
+    for (var k in p) q[k] = k === 'open' ? p[k] : Math.min(1, Math.max(0, p[k] + (Math.random() - 0.5) * 0.08 * hum));
+    p = q;
+  }
+  vel = vel === undefined ? 1 : vel;
   var sr = ctx.sampleRate;
   var lin = function (a, b, x) { return a + (b - a) * x; };
   var ex = function (a, b, x) { return a * Math.pow(b / a, x); };
@@ -146,8 +166,22 @@ function drumVoice(ctx, dest, type, p, t) {
     w.curve = c; return w;
   };
   var osc = function (kind, f) { var o = ctx.createOscillator(); o.type = kind; o.frequency.value = f; return o; };
-  var out = ctx.createGain(); out.gain.value = 0.9; out.connect(dest);
+  var out = ctx.createGain(); out.gain.value = 0.9 * (0.2 + 0.8 * vel);
+  if (vel < 1) {
+    var lp = filt('lowpass', 2500 * Math.pow(8, vel)); lp.connect(dest); out.connect(lp);
+  } else out.connect(dest);
   var len = 0.3;
+  var M = {
+    dung:      { f: [65, 125],  dec: [.18, .8],  dr: [1.15, 2],   nz: 1500, nd: .012, ng: .6 },
+    tung:      { f: [120, 240], dec: [.1, .45],  dr: [1.1, 1.8],  nz: 2200, nd: .012, ng: .7 },
+    tak:       { f: [230, 520], dec: [.04, .18], dr: [1.05, 1.5], nz: 3500, nd: .03,  ng: 1 },
+    ketipung:  { f: [150, 330], dec: [.07, .35], dr: [1.1, 1.9],  nz: 2800, nd: .015, ng: .7 },
+    conga:     { f: [150, 260], dec: [.15, .6],  dr: [1.1, 1.6],  nz: 2500, nd: .012, ng: .6 },
+    congaSlap: { f: [200, 380], dec: [.04, .16], dr: [1.05, 1.4], nz: 3200, nd: .03,  ng: 1 },
+    bongo:     { f: [300, 520], dec: [.08, .3],  dr: [1.05, 1.4], nz: 3500, nd: .012, ng: .6 },
+    jimbe:     { f: [90, 170],  dec: [.2, .8],   dr: [1.2, 2],    nz: 1800, nd: .014, ng: .6 },
+    jimbeSlap: { f: [160, 300], dec: [.04, .16], dr: [1.05, 1.4], nz: 3000, nd: .03,  ng: 1 }
+  };
 
   if (type === 'kick') {
     var f0 = ex(35, 90, p.pitch), fs = f0 * lin(2, 7, p.drop), dec = ex(0.15, 0.9, p.decay);
@@ -202,6 +236,65 @@ function drumVoice(ctx, dest, type, p, t) {
     g.gain.exponentialRampToValueAtTime(0.0001, t + 3 * gap + dec);
     n.connect(bp); bp.connect(g); g.connect(out); n.start(t);
     len = 3 * gap + dec + 0.1;
+  } else if (M[type]) {
+    var cf = M[type], f0 = ex(cf.f[0], cf.f[1], p.pitch), dec = ex(cf.dec[0], cf.dec[1], p.decay);
+    var fs = f0 * lin(cf.dr[0], cf.dr[1], p.drop), bt = t + lin(0.015, 0.06, p.drop);
+    var o = osc('sine', fs), g = ctx.createGain(), o2 = osc('triangle', fs * 1.59), g2 = ctx.createGain();
+    o.frequency.setValueAtTime(fs, t); o.frequency.exponentialRampToValueAtTime(f0, bt);
+    o2.frequency.setValueAtTime(fs * 1.59, t); o2.frequency.exponentialRampToValueAtTime(f0 * 1.59, bt);
+    env(g, 1, dec, t); env(g2, p.body * 0.5, dec * 0.45, t);
+    o.connect(g); o2.connect(g2); g.connect(out); g2.connect(out);
+    o.start(t); o.stop(t + dec + 0.05); o2.start(t); o2.stop(t + dec + 0.05);
+    var nz = noise(0.08), nb = filt('bandpass', cf.nz, 0.9), ng = ctx.createGain();
+    env(ng, p.attack * cf.ng, cf.nd, t);
+    nz.connect(nb); nb.connect(ng); ng.connect(out); nz.start(t);
+    len = dec + 0.1;
+  } else if (type === 'tamborin') {
+    var gap = lin(0.008, 0.03, p.spread), dec = ex(0.06, 0.4, p.decay);
+    var hp = filt('highpass', ex(4500, 9000, p.bright)), g = ctx.createGain();
+    g.gain.setValueAtTime(0.8, t);
+    g.gain.exponentialRampToValueAtTime(0.25, t + gap);
+    g.gain.setValueAtTime(1, t + gap);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + gap + dec);
+    var nz = noise(1), ng = ctx.createGain(); ng.gain.value = 1 - p.jingle * 0.5;
+    nz.connect(ng); ng.connect(hp); nz.start(t);
+    [6200, 7400, 8600, 9900].forEach(function (f) {
+      var o = osc('square', f), og = ctx.createGain(); og.gain.value = 0.06 * p.jingle;
+      o.connect(og); og.connect(hp); o.start(t); o.stop(t + gap + dec + 0.05);
+    });
+    hp.connect(g); g.connect(out);
+    len = gap + dec + 0.1;
+  } else if (type === 'shaker') {
+    var att = lin(0.004, 0.045, p.swell), dec = ex(0.04, 0.22, p.decay);
+    var nz = noise(0.6), bp = filt('bandpass', ex(4500, 9500, p.bright), 0.9), g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.9, t + att);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + att + dec);
+    nz.connect(bp); bp.connect(g); g.connect(out); nz.start(t);
+    len = att + dec + 0.1;
+  } else if (type === 'crash' || type === 'ride') {
+    var ride = type === 'ride';
+    var dec = ride ? ex(0.4, 2, p.decay) : ex(0.5, 2.8, p.decay), base = ride ? 420 : 320;
+    var hp = filt('highpass', ex(2500, 7500, p.bright)), g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(1, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
+    var nz = noise(dec + 0.2), ng = ctx.createGain(); ng.gain.value = (ride ? 0.4 : 0.9) * (1 - p.metal * 0.5);
+    nz.connect(ng); ng.connect(hp); nz.start(t);
+    [1, 1.47, 1.83, 2.27, 2.85, 3.51, 4.17, 5.02].forEach(function (r) {
+      var o = osc('square', base * r), og = ctx.createGain(); og.gain.value = 0.05 * p.metal;
+      o.connect(og); og.connect(hp); o.start(t); o.stop(t + dec + 0.05);
+    });
+    hp.connect(g); g.connect(out);
+    var bn = noise(0.05), bg = ctx.createGain(), bh = filt('highpass', 3000);
+    env(bg, p.bite * 0.6, 0.02, t); bn.connect(bh); bh.connect(bg); bg.connect(out); bn.start(t);
+    if (ride) {
+      [1250, 2010].forEach(function (f, i) {
+        var o = osc('sine', f), og = ctx.createGain();
+        env(og, 0.12 / (i + 1), dec * 0.5, t); o.connect(og); og.connect(out); o.start(t); o.stop(t + dec);
+      });
+    }
+    len = dec + 0.1;
   } else {
     var f0 = ex(80, 300, p.pitch), fs = f0 * lin(1.1, 2.5, p.drop), dec = ex(0.15, 0.8, p.decay);
     var o = osc('sine', fs), o2 = osc('triangle', fs * 1.5), g = ctx.createGain(), g2 = ctx.createGain();
@@ -218,24 +311,54 @@ function drumVoice(ctx, dest, type, p, t) {
   return len;
 }
 
-/* ---------- Definisi jenis drum (hanya untuk antarmuka) ---------- */
+/* ---------- Definisi jenis suara (hanya untuk antarmuka) ---------- */
+var GROUPS = [
+  { id: 'drum', name: 'Drum' }, { id: 'kendang', name: 'Kendang' },
+  { id: 'perkusi', name: 'Perkusi' }, { id: 'cymbal', name: 'Cymbal' }
+];
+function P(k, l, d, lo, hi) { return { k: k, l: l, d: d, r: [lo, hi] }; }
+/* Parameter membran (kendang, conga, bongo, jimbe): semuanya memakai lima slider yang sama. */
+function MEM(pitch, decay, drop, body, attack, slap) {
+  return [P('pitch', 'Pitch', pitch, .25, .8), P('decay', 'Decay', decay, .25, .8), P('drop', 'Pitch Drop', drop, .15, .8),
+    P('body', 'Body', body, .1, .8), P('attack', 'Attack', attack, slap ? .5 : .1, slap ? 1 : .8)];
+}
 var TYPES = {
-  kick:  { name: 'Kick', params: [
-    { k: 'pitch', l: 'Pitch', d: .35, r: [.1, .75] }, { k: 'drop', l: 'Pitch Drop', d: .6, r: [.25, .95] },
-    { k: 'decay', l: 'Decay', d: .5, r: [.15, .8] }, { k: 'click', l: 'Click', d: .4, r: [0, .8] },
-    { k: 'drive', l: 'Drive', d: .3, r: [0, .7] }] },
-  snare: { name: 'Snare', params: [
-    { k: 'tone', l: 'Tone', d: .45, r: [.1, .85] }, { k: 'noise', l: 'Noise', d: .6, r: [.25, .95] },
-    { k: 'snap', l: 'Snap', d: .5, r: [.1, .9] }, { k: 'decay', l: 'Decay', d: .45, r: [.15, .8] }] },
-  hat:   { name: 'Hi-hat', params: [
-    { k: 'decay', l: 'Decay', d: .4, r: [.1, .85] }, { k: 'bright', l: 'Brightness', d: .6, r: [.2, .95] },
-    { k: 'metal', l: 'Metal', d: .5, r: [0, 1] }], toggle: { k: 'open', a: 'Closed', b: 'Open' } },
-  clap:  { name: 'Clap', params: [
-    { k: 'spread', l: 'Spread', d: .5, r: [.15, .9] }, { k: 'decay', l: 'Decay', d: .5, r: [.15, .85] },
-    { k: 'tone', l: 'Tone', d: .5, r: [.1, .9] }] },
-  tom:   { name: 'Tom', params: [
-    { k: 'pitch', l: 'Pitch', d: .45, r: [.05, .95] }, { k: 'decay', l: 'Decay', d: .5, r: [.15, .85] },
-    { k: 'drop', l: 'Pitch Drop', d: .4, r: [.1, .9] }] }
+  kick:  { name: 'Kick', g: 'drum', h: 255, params: [
+    P('pitch', 'Pitch', .35, .1, .75), P('drop', 'Pitch Drop', .6, .25, .95), P('decay', 'Decay', .5, .15, .8),
+    P('click', 'Click', .4, 0, .8), P('drive', 'Drive', .3, 0, .7)] },
+  snare: { name: 'Snare', g: 'drum', h: 175, params: [
+    P('tone', 'Tone', .45, .1, .85), P('noise', 'Noise', .6, .25, .95), P('snap', 'Snap', .5, .1, .9),
+    P('decay', 'Decay', .45, .15, .8)] },
+  hat:   { name: 'Hi-hat', g: 'drum', h: 38, params: [
+    P('decay', 'Decay', .4, .1, .85), P('bright', 'Brightness', .6, .2, .95), P('metal', 'Metal', .5, 0, 1)],
+    toggle: { k: 'open', a: 'Closed', b: 'Open' } },
+  clap:  { name: 'Clap', g: 'drum', h: 322, params: [
+    P('spread', 'Spread', .5, .15, .9), P('decay', 'Decay', .5, .15, .85), P('tone', 'Tone', .5, .1, .9)] },
+  tom:   { name: 'Tom', g: 'drum', h: 135, params: [
+    P('pitch', 'Pitch', .45, .05, .95), P('decay', 'Decay', .5, .15, .85), P('drop', 'Pitch Drop', .4, .1, .9)] },
+
+  dung:      { name: 'Dung', g: 'kendang', h: 18, params: MEM(.45, .55, .5, .45, .3) },
+  tung:      { name: 'Tung', g: 'kendang', h: 32, params: MEM(.5, .45, .45, .4, .35) },
+  tak:       { name: 'Tak', g: 'kendang', h: 48, params: MEM(.5, .4, .3, .5, .8, 1) },
+  ketipung:  { name: 'Ketipung', g: 'kendang', h: 8, params: MEM(.5, .45, .5, .45, .45) },
+
+  conga:     { name: 'Conga', g: 'perkusi', h: 150, params: MEM(.5, .5, .4, .45, .4) },
+  congaSlap: { name: 'Conga Slap', g: 'perkusi', h: 165, params: MEM(.5, .4, .3, .5, .85, 1) },
+  bongo:     { name: 'Bongo', g: 'perkusi', h: 195, params: MEM(.5, .45, .35, .4, .4) },
+  jimbe:     { name: 'Jimbe', g: 'perkusi', h: 100, params: MEM(.45, .55, .5, .35, .35) },
+  jimbeSlap: { name: 'Jimbe Slap', g: 'perkusi', h: 80, params: MEM(.5, .4, .3, .5, .85, 1) },
+  tamborin:  { name: 'Tamborin', g: 'perkusi', h: 290, params: [
+    P('decay', 'Decay', .45, .15, .85), P('bright', 'Brightness', .55, .2, .95), P('jingle', 'Jingle', .6, .2, 1),
+    P('spread', 'Spread', .5, .1, .9)] },
+  shaker:    { name: 'Shaker', g: 'perkusi', h: 215, params: [
+    P('decay', 'Decay', .4, .15, .85), P('bright', 'Brightness', .5, .2, .95), P('swell', 'Swell', .4, .05, .9)] },
+
+  crash: { name: 'Crash', g: 'cymbal', h: 58, params: [
+    P('decay', 'Decay', .55, .25, .85), P('bright', 'Brightness', .6, .25, .95), P('metal', 'Metal', .6, .2, 1),
+    P('bite', 'Bite', .5, .1, .9)] },
+  ride:  { name: 'Ride', g: 'cymbal', h: 70, params: [
+    P('decay', 'Decay', .5, .2, .85), P('bright', 'Brightness', .5, .2, .9), P('metal', 'Metal', .5, .2, 1),
+    P('bite', 'Bite', .4, .1, .8)] }
 };
 function defaults(type) {
   var o = {};
@@ -246,6 +369,7 @@ function defaults(type) {
 /* ---------- Utilitas ---------- */
 var $ = function (id) { return document.getElementById(id); };
 var S = { type: 'kick', p: defaults('kick'), locks: {} };
+var VEL = 1, HUM = false;
 var LIB = [];
 var LS_KEY = 'drumlab.library.v1';
 var actx = null;
@@ -266,10 +390,10 @@ function ac() {
   if (actx.state === 'suspended') actx.resume();
   return actx;
 }
-function play(type, p) { var c = ac(); drumVoice(c, c.destination, type, p, c.currentTime + 0.01); }
+function play(type, p) { var c = ac(); drumVoice(c, c.destination, type, p, c.currentTime + 0.01, VEL, HUM ? 1 : 0); }
 
 function renderBuf(type, p, sr) {
-  var oc = new OfflineAudioContext(1, Math.floor(sr * 1.6), sr);
+  var oc = new OfflineAudioContext(1, Math.floor(sr * 3.5), sr);
   drumVoice(oc, oc.destination, type, p, 0.005);
   return oc.startRendering().then(function (b) {
     var d = b.getChannelData(0).slice(0), n = d.length, i, pk = 0;
@@ -291,7 +415,7 @@ function drawWave(d) {
   cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   var g = cv.getContext('2d'); g.scale(dpr, dpr);
   var cs = getComputedStyle($('app'));
-  var acc = cs.getPropertyValue('--acc').trim() || '#4466ff', line = cs.getPropertyValue('--line').trim() || '#888';
+  var acc = cs.getPropertyValue('--lcd-fg').trim() || '#ff6a2b', line = cs.getPropertyValue('--scope-line').trim() || '#444';
   g.clearRect(0, 0, w, h);
   g.strokeStyle = line; g.lineWidth = 1; g.beginPath(); g.moveTo(0, h / 2 + .5); g.lineTo(w, h / 2 + .5); g.stroke();
   var data = lastWave; if (!data || !data.length) return;
@@ -315,8 +439,19 @@ function preview() {
 var LOCK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 
 function buildTabs() {
-  var box = $('tabs'); box.innerHTML = '';
-  Object.keys(TYPES).forEach(function (k) {
+  var gbox = $('groups'), box = $('tabs'); gbox.innerHTML = ''; box.innerHTML = '';
+  var cur = TYPES[S.type].g;
+  GROUPS.forEach(function (gr) {
+    var b = document.createElement('button');
+    b.className = 'tab grp'; b.type = 'button'; b.textContent = gr.name;
+    b.setAttribute('aria-pressed', String(gr.id === cur));
+    b.onclick = function () {
+      if (gr.id === cur) return;
+      setType(Object.keys(TYPES).filter(function (k) { return TYPES[k].g === gr.id; })[0]);
+    };
+    gbox.appendChild(b);
+  });
+  Object.keys(TYPES).filter(function (k) { return TYPES[k].g === cur; }).forEach(function (k) {
     var b = document.createElement('button');
     b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.id = 'tab-' + k;
     b.setAttribute('aria-selected', String(k === S.type)); b.textContent = TYPES[k].name;
@@ -326,7 +461,7 @@ function buildTabs() {
 }
 function setType(k, params) {
   S.type = k; S.p = params || defaults(k); S.locks = {};
-  $('app').setAttribute('data-type', k);
+  $('app').setAttribute('data-type', k); $('app').style.setProperty('--h', TYPES[k].h);
   $('typeTitle').textContent = TYPES[k].name;
   buildTabs(); buildKnobs(); preview();
 }
@@ -405,7 +540,7 @@ function renderLib() {
     var items = LIB.filter(function (s) { return s.type === tk; });
     if (!items.length) return;
     var grp = document.createElement('div'); grp.className = 'lib-group'; grp.setAttribute('data-type', tk);
-    grp.style.setProperty('--h', { kick: 255, snare: 175, hat: 38, clap: 322, tom: 135 }[tk]);
+    grp.style.setProperty('--h', TYPES[tk].h);
     var h = document.createElement('h3'); h.textContent = TYPES[tk].name + ' (' + items.length + ')'; grp.appendChild(h);
     items.forEach(function (s) { grp.appendChild(libItem(s)); });
     box.appendChild(grp);
@@ -508,8 +643,10 @@ function codeFor(list) {
     '// Pakai: playDrum(audioCtx, DRUM_PRESETS["' + Object.keys(map)[0] + '"]);\n\n' +
     'const DRUM_PRESETS = ' + JSON.stringify(map, null, 2) + ';\n\n' +
     drumVoice.toString() + '\n\n' +
-    'function playDrum(ctx, preset, when) {\n' +
-    '  return drumVoice(ctx, ctx.destination, preset.type, preset.params, when === undefined ? ctx.currentTime : when);\n}\n';
+    '// velocity: 0..1 (pukulan lembut lebih pelan dan redup). humanize: 0..1 (variasi kecil tiap pukulan).\n' +
+    'function playDrum(ctx, preset, when, velocity, humanize) {\n' +
+    '  return drumVoice(ctx, ctx.destination, preset.type, preset.params,\n' +
+    '    when === undefined ? ctx.currentTime : when, velocity === undefined ? 1 : velocity, humanize || 0);\n}\n';
 }
 
 function saveFile(filename, data) {
@@ -553,6 +690,8 @@ function libObj() {
 /* ---------- Mulai ---------- */
 function init() {
   $('play').onclick = function () { play(S.type, S.p); };
+  $('vel').oninput = function () { VEL = $('vel').value / 100; $('velv').textContent = $('vel').value; };
+  $('hum').onclick = function () { HUM = !HUM; $('hum').setAttribute('aria-pressed', String(HUM)); };
   $('rand').onclick = randomize; $('mutate').onclick = mutate; $('reset').onclick = resetP;
   $('save').onclick = saveCurrent;
   $('name').onkeydown = function (e) { if (e.key === 'Enter') saveCurrent(); };
